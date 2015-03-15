@@ -23,7 +23,7 @@ private:
 public:
 	GLTframeDetect(int moduleSide);
 	~GLTframeDetect();
-	int *framePosition(Mat &output,Mat input);
+	int *framePosition(Point (&rawOutput)[6],Point (&avrOutput)[6],Mat input,Mat &out);
 };
 
 #endif

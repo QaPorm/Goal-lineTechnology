@@ -160,17 +160,15 @@ void GLTframeDetect::averageLine(Point &output1,Point &output2,Point input1,Poin
 //left module  -> side=1
 //right module -> side=2
 //back module  -> side=3
-int *GLTframeDetect::framePosition(Mat &output,Mat input)
+int *GLTframeDetect::framePosition(Point (&rawOutput)[6],Point (&avrOutput)[6],Mat input,Mat &out)
 {
-	Mat binary,edge;
-	//houghline var
+	Mat binary,edge,hsv;
+	vector<Mat> hsv_sp;
 	vector<Vec2f> lines;
 	Point pt1,pt2;
 	float rho,theta;
 	double a,b,x0,y0;
-	//output var
 	Point temp[6],temp_avr[2];
-	//avrage output var
 	int sum,avr,avrZone[2];
 	
 	//initial
@@ -199,15 +197,22 @@ int *GLTframeDetect::framePosition(Mat &output,Mat input)
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	//frame's image processing
 	if(side==1||side==2)
-		inRange(input,Scalar(255*0.65,255*0.65,255*0.65),Scalar(255,255,255),binary);
+	{
+		inRange(input,Scalar(255*0.6,255*0.6,255*0.6),Scalar(255,255,255),binary);
+		Canny(binary,edge,70,210,3);
+		HoughLines(edge,lines,1,CV_PI/180,50,0,0);
+	}
 	else if(side==3)
-		inRange(input,Scalar(255*0.4,255*0.4,255*0.4),Scalar(255*0.8,255*0.8,255*0.8),binary);
-	//imshow("d",binary);
-	//waitKey(1);
-	Canny(binary,edge,70,210,3);
+	{
+		cvtColor(input,hsv,CV_RGB2HSV);
+		split(hsv,hsv_sp);
+		inRange(hsv_sp[1],Scalar(30),Scalar(70),binary);
+		//inRange(input,Scalar(255*0.3,255*0.3,255*0.3),Scalar(255*0.6,255*0.6,255*0.6),binary);
+		Canny(binary,edge,70,210,3);
+		HoughLines(edge,lines,1,CV_PI/180,30,0,0);
+	}
 	/////////////////////////////////////////////////////////////////////////////////////////////
-	
-	HoughLines(edge,lines,1,CV_PI/180,30,0,0);
+
 	for(size_t i=0;i<lines.size();i++)
 	{
 		rho=lines[i][0];
@@ -272,7 +277,6 @@ int *GLTframeDetect::framePosition(Mat &output,Mat input)
 		for(sum=0,lineCollection_it=lineCollection.begin();lineCollection_it!=lineCollection.end();++lineCollection_it)
 			sum=sum+(*lineCollection_it);
 		avr=sum/lineCollection.size();
-		cout<<avr<<endl;
 		avrZone[0]=avr-10;
 		avrZone[1]=avr+10;
 		if(temp_avrtotal[0].x<avrZone[0]||temp_avrtotal[0].x>avrZone[1])	//if zone change
@@ -282,7 +286,7 @@ int *GLTframeDetect::framePosition(Mat &output,Mat input)
 			temp_avrtotal[0].x=avr;
 			temp_avrtotal[1].x=avr;
 		}
-		if(temp_avr[0].x>=avrZone[0]&&temp_avr[0].x<=avrZone[1])	//find right line in zone
+		if(temp_avr[0].x>=avrZone[0]&&temp_avr[0].x<=avrZone[1])	//find fittest line in zone
 		{
 			if(side==1)
 			{
@@ -305,23 +309,23 @@ int *GLTframeDetect::framePosition(Mat &output,Mat input)
 				}
 			}
 		}
-		line(input,temp_total[0],temp_total[1],Scalar(0,0,255),1,CV_AA);	//draw real post line
-		line(input,temp_avrtotal[0],temp_avrtotal[1],Scalar(0,255,0),1,CV_AA);
-		output=input;
+		rawOutput[0]=temp_total[0];
+		rawOutput[1]=temp_total[1];
+		avrOutput[0]=temp_avrtotal[0];
+		avrOutput[1]=temp_avrtotal[1];
+		out=binary;
 		outputPos[0]=temp_avrtotal[0].x;
 	}
 	else if(side==3)
 	{
-		line(input,temp[0],temp[1],Scalar(0,0,255),1,CV_AA);
-		line(input,temp[2],temp[3],Scalar(0,0,255),1,CV_AA);
-		line(input,temp[4],temp[5],Scalar(0,0,255),1,CV_AA);
+		for(int i=0;i<6;i++)
+			rawOutput[i]=temp[i];
 		averageLine(temp[0],temp[1],temp[0],temp[1],2);
 		averageLine(temp[2],temp[3],temp[2],temp[3],1);
 		averageLine(temp[4],temp[5],temp[4],temp[5],1);
-		line(input,temp[0],temp[1],Scalar(0,255,0),1,CV_AA);
-		line(input,temp[2],temp[3],Scalar(0,255,0),1,CV_AA);
-		line(input,temp[4],temp[5],Scalar(0,255,0),1,CV_AA);
-		output=input;
+		for(int i=0;i<6;i++)
+			avrOutput[i]=temp[i];
+		out=binary;
 		outputPos[0]=temp[0].y;	//bar
 		outputPos[1]=temp[2].x;	//left post
 		outputPos[2]=temp[4].x;	//right post

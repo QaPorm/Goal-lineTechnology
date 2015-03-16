@@ -1,0 +1,7 @@
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
+cmake_minimum_required(VERSION 2.8)
+project(GLTserver)
+find_package(OpenCV REQUIRED)
+include_directories("${PROJECT_SOURCE_DIR}/include")
+add_executable(mainServer src/mainServer.cpp src/TCPserver.cpp)
+target_link_libraries(mainServer ${OpenCV_LIBS})

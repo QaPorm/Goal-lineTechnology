@@ -1,3 +1,12 @@
+//////////////////////////////////////////////////////
+//	GOAL-LINE TECHNOLOGY							//
+//	Senior Project 2014 (Computer Engineering)		//
+//	Faculty of Engineering, Mahidol University		//
+//		Nuttaya Sripop								//
+//		Prachara Chanprakhon						//
+//		Rungroj Somwong								//
+//////////////////////////////////////////////////////
+
 #include"GLTframeDetect.h"
 
 using namespace std;
@@ -31,7 +40,7 @@ GLTframeDetect::~GLTframeDetect()
 	free(outputPos);
 }
 
-//set value of Point variable (2 variable)
+//set value of Point variables (2 variables)
 void GLTframeDetect::setTempPoint(Point &temp1,Point &temp2,Point pt1,Point pt2)
 {
 	temp1=pt1;
@@ -41,6 +50,7 @@ void GLTframeDetect::setTempPoint(Point &temp1,Point &temp2,Point pt1,Point pt2)
 //average line to make 90 degree line
 //vertical   -> axis=1;
 //horizontal -> axis=2;
+//use triangle properties to move line's point(2 points) from outer to inner image, then average it.
 void GLTframeDetect::averageLine(Point &output1,Point &output2,Point input1,Point input2,int axis)
 {
 	Point top,down;
@@ -160,6 +170,7 @@ void GLTframeDetect::averageLine(Point &output1,Point &output2,Point input1,Poin
 //left module  -> side=1
 //right module -> side=2
 //back module  -> side=3
+//give points of raw line from hough line and points of average line of raw line (pass by reference) to draw them later.
 int *GLTframeDetect::framePosition(Point (&rawOutput)[6],Point (&avrOutput)[6],Mat input,Mat &out)
 {
 	Mat binary,edge,hsv;
@@ -196,21 +207,9 @@ int *GLTframeDetect::framePosition(Point (&rawOutput)[6],Point (&avrOutput)[6],M
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	//frame's image processing
-	if(side==1||side==2)
-	{
-		inRange(input,Scalar(255*0.6,255*0.6,255*0.6),Scalar(255,255,255),binary);
-		Canny(binary,edge,70,210,3);
-		HoughLines(edge,lines,1,CV_PI/180,50,0,0);
-	}
-	else if(side==3)
-	{
-		cvtColor(input,hsv,CV_RGB2HSV);
-		split(hsv,hsv_sp);
-		inRange(hsv_sp[1],Scalar(30),Scalar(70),binary);
-		//inRange(input,Scalar(255*0.3,255*0.3,255*0.3),Scalar(255*0.6,255*0.6,255*0.6),binary);
-		Canny(binary,edge,70,210,3);
-		HoughLines(edge,lines,1,CV_PI/180,30,0,0);
-	}
+	inRange(input,Scalar(255*0.6,255*0.6,255*0.6),Scalar(255,255,255),binary);
+	Canny(binary,edge,70,210,3);
+	HoughLines(edge,lines,1,CV_PI/180,50,0,0);
 	/////////////////////////////////////////////////////////////////////////////////////////////
 
 	for(size_t i=0;i<lines.size();i++)
@@ -279,7 +278,7 @@ int *GLTframeDetect::framePosition(Point (&rawOutput)[6],Point (&avrOutput)[6],M
 		avr=sum/lineCollection.size();
 		avrZone[0]=avr-10;
 		avrZone[1]=avr+10;
-		if(temp_avrtotal[0].x<avrZone[0]||temp_avrtotal[0].x>avrZone[1])	//if zone change
+		if(temp_avrtotal[0].x<avrZone[0]||temp_avrtotal[0].x>avrZone[1])	//if zone change, move line to zone
 		{
 			temp_total[0].x=avr;
 			temp_total[1].x=avr;
@@ -314,7 +313,7 @@ int *GLTframeDetect::framePosition(Point (&rawOutput)[6],Point (&avrOutput)[6],M
 		avrOutput[0]=temp_avrtotal[0];
 		avrOutput[1]=temp_avrtotal[1];
 		out=binary;
-		outputPos[0]=temp_avrtotal[0].x;
+		outputPos[0]=temp_avrtotal[0].x;	//left or right post
 	}
 	else if(side==3)
 	{

@@ -17,7 +17,7 @@ condition_variable connection;
 int F_countModule=0;
 int post[2],goal[3];
 Point ball[3];
-int rad[3];
+int rad[3],timestamp[3];
 int isGoal=0;
 
 void resultDisplay()
@@ -27,11 +27,17 @@ void resultDisplay()
 	namedWindow("Result",CV_WINDOW_AUTOSIZE);
 	while(1)
 	{
-		if(isGoal==1)
+		if(isGoal==0)
+		{
 			imshow("Result",goal);
-		else
-			imshow("Result",nogoal);
-		waitKey(1);
+			waitKey(1);
+		}
+		else if(isGoal==1)
+		{
+			while(waitKey(1)!=10)
+				imshow("Result",nogoal);
+			isGoal=0;
+		}
 	}
 	destroyWindow("Result");
 }
@@ -44,8 +50,7 @@ void clientConnect(int side,string name)
 	uchar sockData[imgsize];
 	int32_t notice;
 	int32_t buffer;
-	int bufferArray[3];
-	
+	int bufferArray[3],bufferRecv[4];
 	
 	unique_lock<mutex> lck(mtx);
 	//INITIALIZE STEP/////////////////////////////////////////////////////////////////////////////////
@@ -53,7 +58,7 @@ void clientConnect(int side,string name)
 	cout<<" > Connecting...";
 	cout.flush();
 	TCPserver *serverInit=new TCPserver(port);
-	cout<<".........................[OK]"<<endl;
+	cout<<"................................[OK]"<<endl;
 	cout<<" > Adjusting Camera...";
 	cout.flush();
 	namedWindow("Adjusting Camera",CV_WINDOW_AUTOSIZE);
@@ -80,43 +85,158 @@ void clientConnect(int side,string name)
 			serverInit->recvData(&bufferArray,3*sizeof(int));
 		imshow("Adjusting Camera",img);
 	}
-	for(int i=0;i<5;i++)
-	{
-		destroyWindow("Adjusting Camera");
-		waitKey(1);
-	}
 	notice=htonl(131);
 	serverInit->sendData(&notice,sizeof(notice));
-	cout<<"...................[OK]"<<endl;
+	cout<<"..........................[OK]"<<endl;
 	if(side==1||side==2)
 	{
 		post[side-1]=htonl(buffer);
-		cout<<" > Goal-line position....................["<<post[side-1]<<"]"<<endl;
+		cout<<" > Goal-line position...........................["<<post[side-1]<<"]"<<endl;
 	}
 	else if(side==3)
 	{
 		for(int i=0;i<3;i++)
 			goal[i]=bufferArray[i];
-		cout<<" > Bar position..........................["<<goal[0]<<"]"<<endl;
-		cout<<" > Left Post position....................["<<goal[1]<<"]"<<endl;
-		cout<<" > Right Post position...................["<<goal[2]<<"]"<<endl;
+		cout<<" > Bar position.................................["<<goal[0]<<"]"<<endl;
+		cout<<" > Left Post position...........................["<<goal[1]<<"]"<<endl;
+		cout<<" > Right Post position..........................["<<goal[2]<<"]"<<endl;
 	}
 	//////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	//POSITION CALIBRATE//////////////////////////////////////////////////////////////////////////////
-	/*string line;
-	while(1)
+	Point car[2];
+	Mat showCar;
+	int key,temp[3];
+	if(side==1||side==2)
 	{
-		cout<<" > Position calibrate? ..................[Y/N] > ";
-		cin>>line;
-		if(line=="Y"||line=="y")
+		car[0]=Point(post[side-1],-1000);
+		car[1]=Point(post[side-1],1000);
+		if(car[0].x<=0)
 		{
-			//calibrate func
+			car[0]=Point(5,-1000);
+			car[1]=Point(5,1000);
 		}
-		else if(line=="N"||line=="n")
-			break;
+		while(1)
+		{
+			showCar=img.clone();
+			line(showCar,car[0],car[1],Scalar(255,0,0),1,CV_AA);
+			imshow("Adjusting Camera",showCar);
+			key=waitKey(1);
+			if(key==65361) // <-
+			{
+				car[0].x-=1;
+				car[1].x-=1;
+			}
+			else if(key==65363)	// ->
+			{
+				car[0].x+=1;
+				car[1].x+=1;
+			}
+			if(key==10)
+				break;
+		}
+		for(int i=0;i<5;i++)
+		{
+			destroyWindow("Adjusting Camera");
+			waitKey(1);
+		}
+		if(post[side-1]!=car[0].x)
+		{
+			cout<<" > Calibrated position..........................["<<car[0].x<<"]"<<endl;
+			post[side-1]=car[0].x;
+		}
 	}
-	cout<<endl;*/
+	else if(side==3)
+	{
+		for(int i=0;i<3;i++)
+		{
+			if(i==0)
+			{
+				car[0]=Point(-1000,goal[0]);
+				car[1]=Point(1000,goal[0]);
+				if(car[0].y<=0)
+				{
+					car[0]=Point(-1000,5);
+					car[1]=Point(1000,5);
+				}
+				while(1)
+				{
+					showCar=img.clone();
+					line(showCar,car[0],car[1],Scalar(255,0,0),1,CV_AA);
+					imshow("Adjusting Camera",showCar);
+					key=waitKey(1);
+					if(key==65362) // ^
+					{
+						car[0].y-=1;
+						car[1].y-=1;
+					}
+					else if(key==65364)	// v
+					{
+						car[0].y+=1;
+						car[1].y+=1;
+					}
+					if(key==10)
+						break;
+				}
+				temp[0]=car[0].y;
+			}
+			else
+			{
+				car[0]=Point(goal[i],-1000);
+				car[1]=Point(goal[i],1000);
+				if(car[0].x<=0)
+				{
+					car[0]=Point(5,-1000);
+					car[1]=Point(5,1000);
+				}
+				else if(car[0].x>=640)
+				{
+					car[0]=Point(635,-1000);
+					car[1]=Point(635,1000);
+				}
+				while(1)
+				{
+					showCar=img.clone();
+					line(showCar,car[0],car[1],Scalar(255,0,0),1,CV_AA);
+					imshow("Adjusting Camera",showCar);
+					key=waitKey(1);
+					if(key==65361) // <-
+					{
+						car[0].x-=1;
+						car[1].x-=1;
+					}
+					else if(key==65363)	// ->
+					{
+						car[0].x+=1;
+						car[1].x+=1;
+					}
+					if(key==10)
+						break;
+				}
+				temp[i]=car[0].x;
+			}
+		}
+		for(int i=0;i<5;i++)
+		{
+			destroyWindow("Adjusting Camera");
+			waitKey(1);
+		}
+		if(goal[0]!=temp[0])
+		{
+			cout<<" > Calibrated bar position......................["<<temp[0]<<"]"<<endl;
+			goal[0]=temp[0];
+		}
+		if(goal[1]!=temp[1])
+		{
+			cout<<" > Calibrated left post position................["<<temp[1]<<"]"<<endl;
+			goal[1]=temp[1];
+		}
+		if(goal[2]!=temp[2])
+		{
+			cout<<" > Calibrated right post position...............["<<temp[2]<<"]"<<endl;
+			goal[2]=temp[2];
+		}
+	}
 	//////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	F_countModule++;	
@@ -132,21 +252,20 @@ void clientConnect(int side,string name)
 	//PROCESSING STEP/////////////////////////////////////////////////////////////////////////////////
 	while(1)
 	{
-		lck.lock();
-		serverProcess->recvData(&bufferArray,3*sizeof(int));
-		ball[side-1]=Point(bufferArray[0],bufferArray[1]);
-		rad[side-1]=bufferArray[2];
-		cout<<ball[side-1]<<" "<<rad[side-1]<<endl;
-		lck.unlock();
+		serverProcess->recvData(&bufferRecv,4*sizeof(int));
+		ball[side-1]=Point(bufferRecv[0],bufferRecv[1]);
+		rad[side-1]=bufferRecv[2];
+		timestamp[side-1]=bufferRecv[3];
 	}
 	//////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	delete serverProcess;
 }
 
-
 int main()
 {
+	int leftGoal=0,rightGoal=0,backGoal=0;
+	
 	system("clear");
 	cout<<"////////////////////////////////////////////////////////"<<endl
 		<<"///                                                  ///"<<endl
@@ -166,6 +285,36 @@ int main()
 	connection.notify_all();
 	thread result(resultDisplay);
 	result.detach();
+	
+	//DECISION////////////////////////////////////////////////////////////////////////////////////////
+	while(1)
+	{
+		leftGoal=0;
+		rightGoal=0;
+		backGoal=0;
+		//set condition
+		if((ball[0].x+rad[0])<post[0])
+			leftGoal=1;
+		if((ball[1].x-rad[1])>post[1])
+			rightGoal=1;
+		if((ball[3].y-rad[3]>goal[0])&&(ball[3].x-rad[3]>goal[1])&&(ball[3].x+rad[3]<goal[2]))
+			backGoal=1;
+		else if((ball[3].y-rad[3]<=goal[0])&&(ball[3].x-rad[3]<=goal[1])&&(ball[3].x+rad[3]>=goal[2]))	//out goal but can see in frame
+			backGoal=2;
+		//check condition
+		if(backGoal==0)
+		{
+			if(leftGoal==1&&rightGoal==1)
+				isGoal=1;
+		}
+		else
+		{
+			if((leftGoal==1||rightGoal==1)&&backGoal==1)
+				isGoal=1;
+		}
+	}
+	//////////////////////////////////////////////////////////////////////////////////////////////////
+	
 	lModule.join();
 	rModule.join();
 	bModule.join();
@@ -174,18 +323,18 @@ int main()
 }
 
 
-
-//countModule update before each finish
-//fist second third init finish wait
-//mainthread check countModule==3
-//- mainthread countModule++
-//  notify all 
-//- wait 10 sec and notify all
-//while loop sleep for waiting (client)
-//send notice to client tell that server will create
-//delete sock1
-//exit loop (client)
-//client wait for 10
-//create server
-//client create
-//ifconnect start loop recv, send
+//init and processing step, link protocol
+//(server)each thread countModule++ after finish
+//(server)all thread except mainthread wait
+//(server)mainthread check countModule==3
+//(server)mainthread countModule++
+//(server)notify all 
+//(client)while loop sleep for waiting
+//(server)send notice to client tell that serverProcess will create
+//(server)delete serverInit
+//(client)exit loop
+//(client)wait for 10 s
+//(server)create serverProcess
+//(client)connect
+//(server)after connect start loop recv
+//(client)after connebt start loop send

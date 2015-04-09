@@ -109,11 +109,6 @@ void recvHandler()
 	}
 }
 
-
-
-
-
-
 int main(int argc,char *argv[])
 {	
 	int port;
@@ -183,7 +178,7 @@ int main(int argc,char *argv[])
 	GLTballDetect *bDetect=new GLTballDetect(side);
 	
 	raspicam::RaspiCam_Cv bCam;
-	bCam.set(CV_CAP_PROP_FORMAT,CV_8UC3);
+	bCam.set(CV_CAP_PROP_FORMAT,CV_8UC1);
 	bCam.set(CV_CAP_PROP_FRAME_WIDTH,640);
 	bCam.set(CV_CAP_PROP_FRAME_HEIGHT,360);
 	bCam.set(CV_CAP_PROP_EXPOSURE,1);

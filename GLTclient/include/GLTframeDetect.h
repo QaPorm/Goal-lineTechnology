@@ -1,3 +1,12 @@
+//////////////////////////////////////////////////////
+//	GOAL-LINE TECHNOLOGY							//
+//	Senior Project 2014 (Computer Engineering)		//
+//	Faculty of Engineering, Mahidol University		//
+//	Nuttaya Sripop									//
+//	Prachara Chanprakhon							//
+//	Rungroj Somwong									//
+//////////////////////////////////////////////////////
+
 #ifndef __GLTFRAMEDETECT_H
 #define __GLTFRAMEDETECT_H
 #include<iostream>

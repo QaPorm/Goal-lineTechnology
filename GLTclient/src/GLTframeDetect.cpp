@@ -2,12 +2,15 @@
 //	GOAL-LINE TECHNOLOGY							//
 //	Senior Project 2014 (Computer Engineering)		//
 //	Faculty of Engineering, Mahidol University		//
-//		Nuttaya Sripop								//
-//		Prachara Chanprakhon						//
-//		Rungroj Somwong								//
+//	Nuttaya Sripop									//
+//	Prachara Chanprakhon							//
+//	Rungroj Somwong									//
 //////////////////////////////////////////////////////
 
 #include"GLTframeDetect.h"
+
+#define LEFT_POST_AREA 200
+#define RIGHT_POST_AREA 440
 
 using namespace std;
 using namespace cv;
@@ -249,12 +252,12 @@ int *GLTframeDetect::framePosition(Point (&rawOutput)[6],Point (&avrOutput)[6],M
 			}
 			else if(pt1.x>-900&&pt1.x<900&&pt2.x>-900&&pt2.x<900)	//post (vertical)
 			{
-				if(pt1.x<200&&pt2.x<200)	//left post (find from this area)
+				if(pt1.x<LEFT_POST_AREA&&pt2.x<LEFT_POST_AREA)	//left post (find from this area)
 				{
 					if(pt1.x>temp[2].x&&pt2.x>temp[3].x)
 						setTempPoint(temp[2],temp[3],pt1,pt2);
 				}
-				else if(pt1.x>440&&pt2.x>440)	//right post (find from this area)
+				else if(pt1.x>RIGHT_POST_AREA&&pt2.x>RIGHT_POST_AREA)	//right post (find from this area)
 				{
 					if(pt1.x<temp[4].x&&pt2.x<temp[5].x)
 						setTempPoint(temp[4],temp[5],pt1,pt2);

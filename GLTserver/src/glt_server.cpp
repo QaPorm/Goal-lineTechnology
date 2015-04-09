@@ -29,13 +29,13 @@ void resultDisplay()
 	{
 		if(isGoal==0)
 		{
-			imshow("Result",goal);
+			imshow("Result",nogoal);
 			waitKey(1);
 		}
 		else if(isGoal==1)
 		{
 			while(waitKey(1)!=10)
-				imshow("Result",nogoal);
+				imshow("Result",goal);
 			isGoal=0;
 		}
 	}
@@ -45,7 +45,7 @@ void resultDisplay()
 void clientConnect(int side,string name)
 {
 	int port=side*1111;
-	Mat img=Mat::zeros(480,640,CV_8UC3);	//360,640
+	Mat img=Mat::zeros(360,640,CV_8UC3);	//360,640
 	int bytes,imgsize=img.total()*img.elemSize();
 	uchar sockData[imgsize];
 	int32_t notice;
@@ -246,7 +246,7 @@ void clientConnect(int side,string name)
 	notice=htonl(845);	//rdy
 	serverInit->sendData(&notice,sizeof(notice));
 	delete serverInit;
-	port=(side*1111)+50;	//port 1161, 2271, 3381
+	port=(side*1111)+50;	//port 1161, 2272, 3383
 	TCPserver *serverProcess=new TCPserver(port);
 	
 	//PROCESSING STEP/////////////////////////////////////////////////////////////////////////////////
@@ -297,9 +297,9 @@ int main()
 			leftGoal=1;
 		if((ball[1].x-rad[1])>post[1])
 			rightGoal=1;
-		if((ball[3].y-rad[3]>goal[0])&&(ball[3].x-rad[3]>goal[1])&&(ball[3].x+rad[3]<goal[2]))
+		if((ball[2].y-rad[2]>goal[0])&&(ball[2].x-rad[2]>goal[1])&&(ball[2].x+rad[2]<goal[2]))
 			backGoal=1;
-		else if((ball[3].y-rad[3]<=goal[0])&&(ball[3].x-rad[3]<=goal[1])&&(ball[3].x+rad[3]>=goal[2]))	//out goal but can see in frame
+		else if((ball[2].y-rad[2]<=goal[0])&&(ball[2].x-rad[2]<=goal[1])&&(ball[2].x+rad[2]>=goal[2]))	//out goal but can see in frame
 			backGoal=2;
 		//check condition
 		if(backGoal==0)

@@ -14,11 +14,10 @@ using namespace cv;
 
 mutex mtx;
 condition_variable connection;
-int F_countModule=0;
+int countModule=0,isGoal=0;
 int post[2],goal[3];
 Point ball[3];
 int rad[3],timestamp[3];
-int isGoal=0;
 
 void resultDisplay()
 {
@@ -239,8 +238,8 @@ void clientConnect(int side,string name)
 	}
 	//////////////////////////////////////////////////////////////////////////////////////////////////
 	
-	F_countModule++;	
-	while(F_countModule!=4)
+	countModule++;	
+	while(countModule!=4)
 		connection.wait(lck);
 	lck.unlock();
 	notice=htonl(845);	//rdy
@@ -278,9 +277,9 @@ int main()
 	thread rModule(clientConnect,2,"RIGHT");
 	sleep(1);
 	thread bModule(clientConnect,3,"BACK");
-	while(F_countModule!=3)
+	while(countModule!=3)
 		sleep(1);
-	F_countModule++;
+	countModule++;
 	cout<<"System synchronization"<<endl;
 	connection.notify_all();
 	thread result(resultDisplay);
@@ -302,15 +301,28 @@ int main()
 		else if((ball[2].y-rad[2]<=goal[0])&&(ball[2].x-rad[2]<=goal[1])&&(ball[2].x+rad[2]>=goal[2]))	//out goal but can see in frame
 			backGoal=2;
 		//check condition
+		
+		
 		if(backGoal==0)
 		{
 			if(leftGoal==1&&rightGoal==1)
-				isGoal=1;
+			{
+				if(sqrt(pow(ball[0].x-ball[1].x,2)+pow(ball[0].y-ball[1].y,2))<=20)	//check left and right has similar position
+					isGoal=1;
+			}
 		}
-		else
+		else if(backGoal==1)
 		{
-			if((leftGoal==1||rightGoal==1)&&backGoal==1)
-				isGoal=1;
+			if(leftGoal==1)
+			{
+				if((ball[0].y<=200&&ball[2].y<=200)||(ball[0].y>=160&&ball[2].y>=160))	//check left and back has smilar height
+					isGoal=1;
+			}
+			if(rightGoal==1)
+			{
+				if((ball[1].y<=200&&ball[2].y<=200)||(ball[1].y>=160&&ball[2].y>=160))	//check right and back has similar height
+					isGoal=1;
+			}
 		}
 	}
 	//////////////////////////////////////////////////////////////////////////////////////////////////

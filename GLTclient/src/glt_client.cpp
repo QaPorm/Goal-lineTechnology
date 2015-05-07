@@ -1,3 +1,15 @@
+//////////////////////////////////////////////////////////////////////////////
+//	GOAL-LINE TECHNOLOGY													//
+//	Senior Project 2014 (Computer Engineering)								//
+//	Faculty of Engineering, Mahidol University								//
+//	Nattaya Sriphop															//
+//	Patchara Chanprakhon													//
+//	Rungroj Somwong															//
+//////////////////////////////////////////////////////////////////////////////
+//	glt_client.cpp - connect with server and send goal frame position,		//
+//					 then loop detect ball and send position.				//
+//////////////////////////////////////////////////////////////////////////////
+
 #include<iostream>
 #include<cstdio>
 #include<cstdlib>
@@ -39,30 +51,11 @@ void preview_and_Send()
 		exit(-1);
 	}
 	
-	/*string name;
-	if(side==1)
-		name="/media/sf_Virtualbox_shared/video/L.mp4";
-	else if(side==2)
-		name="/media/sf_Virtualbox_shared/video/R.264";
-	else if(side==3)
-		name="/home/qaporm/GLT/Bdetect/goal.mp4";
-	VideoCapture cap(name);
-	if(!cap.isOpened())
-	{
-		cout<<"Cant open video"<<endl;
-		exit(-1);
-	}*/
-	
 	while(initFlag!=1)
 	{
 		fCam.grab();
 		fCam.retrieve(fCapture);
-		/*bool success=cap.read(fCapture);
-		if(!success)
-		{
-			cout<<"error-cannot read frame"<<endl;
-			exit(-1);
-		}*/
+		
 		frame=fCapture.clone();
 		showImg=fCapture.clone();
 		if(side==1||side==2)
@@ -149,7 +142,7 @@ int main(int argc,char *argv[])
 	{	
 		if(frame.empty()!=1)
 		{
-			bufPos=fDetect->framePosition(raw,avr,frame,out);
+			bufPos=fDetect->framePosition(raw,avr,frame);
 			if(side==1||side==2)
 				pixPos=bufPos[0];
 			else if(side==3)

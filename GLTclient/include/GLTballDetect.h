@@ -1,3 +1,14 @@
+//////////////////////////////////////////////////////////////////////////////
+//	GOAL-LINE TECHNOLOGY													//
+//	Senior Project 2014 (Computer Engineering)								//
+//	Faculty of Engineering, Mahidol University								//
+//	Nattaya Sriphop															//
+//	Patchara Chanprakhon													//
+//	Rungroj Somwong															//
+//////////////////////////////////////////////////////////////////////////////
+//	GLTballDetect.h - ball detecttion and positioning (header).				//
+//////////////////////////////////////////////////////////////////////////////
+
 #ifndef __GLTBALLDETECT_H
 #define __GLTBALLDETECT_H
 #include<iostream>

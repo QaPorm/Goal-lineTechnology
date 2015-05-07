@@ -1,11 +1,14 @@
-//////////////////////////////////////////////////////
-//	GOAL-LINE TECHNOLOGY							//
-//	Senior Project 2014 (Computer Engineering)		//
-//	Faculty of Engineering, Mahidol University		//
-//	Nuttaya Sripop									//
-//	Prachara Chanprakhon							//
-//	Rungroj Somwong									//
-//////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+//	GOAL-LINE TECHNOLOGY													//
+//	Senior Project 2014 (Computer Engineering)								//
+//	Faculty of Engineering, Mahidol University								//
+//	Nattaya Sriphop															//
+//	Patchara Chanprakhon													//
+//	Rungroj Somwong															//
+//////////////////////////////////////////////////////////////////////////////
+//	GLTframeDetect.cpp - goal frame detection and positioning.				//
+//					     ***suitable for Mahidol University football field.	//
+//////////////////////////////////////////////////////////////////////////////
 
 #include"GLTframeDetect.h"
 
@@ -174,7 +177,7 @@ void GLTframeDetect::averageLine(Point &output1,Point &output2,Point input1,Poin
 //right module -> side=2
 //back module  -> side=3
 //give points of raw line from hough line and points of average line of raw line (pass by reference) to draw them later.
-int *GLTframeDetect::framePosition(Point (&rawOutput)[6],Point (&avrOutput)[6],Mat input,Mat &out)
+int *GLTframeDetect::framePosition(Point (&rawOutput)[6],Point (&avrOutput)[6],Mat input)
 {
 	Mat binary,edge,hsv;
 	vector<Mat> hsv_sp;
@@ -315,7 +318,6 @@ int *GLTframeDetect::framePosition(Point (&rawOutput)[6],Point (&avrOutput)[6],M
 		rawOutput[1]=temp_total[1];
 		avrOutput[0]=temp_avrtotal[0];
 		avrOutput[1]=temp_avrtotal[1];
-		out=binary;
 		outputPos[0]=temp_avrtotal[0].x;	//left or right post
 	}
 	else if(side==3)
@@ -327,7 +329,6 @@ int *GLTframeDetect::framePosition(Point (&rawOutput)[6],Point (&avrOutput)[6],M
 		averageLine(temp[4],temp[5],temp[4],temp[5],1);
 		for(int i=0;i<6;i++)
 			avrOutput[i]=temp[i];
-		out=binary;
 		outputPos[0]=temp[0].y;	//bar
 		outputPos[1]=temp[2].x;	//left post
 		outputPos[2]=temp[4].x;	//right post

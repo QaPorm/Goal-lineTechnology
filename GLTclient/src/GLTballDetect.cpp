@@ -1,3 +1,16 @@
+//////////////////////////////////////////////////////////////////////////////
+//	GOAL-LINE TECHNOLOGY													//
+//	Senior Project 2014 (Computer Engineering)								//
+//	Faculty of Engineering, Mahidol University								//
+//	Nattaya Sriphop															//
+//	Patchara Chanprakhon													//
+//	Rungroj Somwong															//
+//////////////////////////////////////////////////////////////////////////////
+//	GLTballDetect.cpp - ball detecttion and positioning.					//
+//					    ***mean and variance range set by use meanCheck to	//
+//						   find mean and variance of the ball.				//
+//////////////////////////////////////////////////////////////////////////////
+
 #include"GLTballDetect.h"
 #define MIN_MEAN 100
 #define MAX_MEAN 150
@@ -20,9 +33,7 @@ GLTballDetect::GLTballDetect(int moduleSide)
 
 Point GLTballDetect::ballPosition(int &radius,Mat input)
 {
-	Mat avgImg,moving,subImg,roiImg;
-	Mat openEle=getStructuringElement(MORPH_ELLIPSE,Size(4,4));
-	Mat closeEle=getStructuringElement(MORPH_ELLIPSE,Size(10,10));
+	Mat subImg,roiImg;
 	vector<Vec3f> circles;
 	Point center;
 	int rad,dis;
@@ -40,7 +51,7 @@ Point GLTballDetect::ballPosition(int &radius,Mat input)
 		subImg=Mat::zeros(rad*2,rad*2,CV_8UC1);	//create subimage of circle
 		circle(subImg,Point(rad,rad),rad,Scalar(255,255,255),-1,8,0);
 		Rect roi=Rect((center.x)-rad,(center.y)-rad,rad*2,rad*2);	//select roi (circle)
-		if(roi.x>=0&&roi.y>=0&&roi.width+roi.x<input.cols&&roi.height+roi.y<input.rows)
+		if(roi.x>=0&&roi.y>=0&&roi.width+roi.x<input.cols&&roi.height+roi.y<input.rows)	//check mean and variange is in range
 		{
 			roiImg=input(roi);
 			bitwise_and(subImg,roiImg,subImg);	//circle subimage
@@ -49,6 +60,7 @@ Point GLTballDetect::ballPosition(int &radius,Mat input)
 			if(mean[0]>=MIN_MEAN&&mean[0]<=MAX_MEAN&&variance>=MIN_VARS&&variance<=MAX_VARS)
 				circle(input,center,rad,Scalar(255,255,255),2,8,0);
 		}
+		break;
 	}
 	radius=rad;
 	return center;

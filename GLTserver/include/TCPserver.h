@@ -1,3 +1,14 @@
+//////////////////////////////////////////////////////////////////////////////
+//	GOAL-LINE TECHNOLOGY													//
+//	Senior Project 2014 (Computer Engineering)								//
+//	Faculty of Engineering, Mahidol University								//
+//	Nattaya Sriphop															//
+//	Patchara Chanprakhon													//
+//	Rungroj Somwong															//
+//////////////////////////////////////////////////////////////////////////////
+//	TCPserver.h - TCP protocol of server side. (header)						//
+//////////////////////////////////////////////////////////////////////////////
+
 #ifndef __TCPSERVER_H
 #define __TCPSERVER_H
 #include<iostream>

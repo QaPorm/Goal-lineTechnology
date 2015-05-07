@@ -1,3 +1,14 @@
+//////////////////////////////////////////////////////////////////////////////
+//	GOAL-LINE TECHNOLOGY													//
+//	Senior Project 2014 (Computer Engineering)								//
+//	Faculty of Engineering, Mahidol University								//
+//	Nattaya Sriphop															//
+//	Patchara Chanprakhon													//
+//	Rungroj Somwong															//
+//////////////////////////////////////////////////////////////////////////////
+//	TCPclient.h - TCP protocol of client side. (header)						//
+//////////////////////////////////////////////////////////////////////////////
+
 #ifndef __TCPCLIENT_H
 #define __TCPCLIENT_H
 #include<iostream>

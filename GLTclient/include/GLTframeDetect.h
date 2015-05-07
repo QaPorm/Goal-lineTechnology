@@ -1,11 +1,14 @@
-//////////////////////////////////////////////////////
-//	GOAL-LINE TECHNOLOGY							//
-//	Senior Project 2014 (Computer Engineering)		//
-//	Faculty of Engineering, Mahidol University		//
-//	Nuttaya Sripop									//
-//	Prachara Chanprakhon							//
-//	Rungroj Somwong									//
-//////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+//	GOAL-LINE TECHNOLOGY													//
+//	Senior Project 2014 (Computer Engineering)								//
+//	Faculty of Engineering, Mahidol University								//
+//	Nattaya Sriphop															//
+//	Patchara Chanprakhon													//
+//	Rungroj Somwong															//
+//////////////////////////////////////////////////////////////////////////////
+//	GLTframeDetect.h - goal frame detection and positioning. (header)		//
+//					   ***suitable for Mahidol University football field.	//
+//////////////////////////////////////////////////////////////////////////////
 
 #ifndef __GLTFRAMEDETECT_H
 #define __GLTFRAMEDETECT_H
@@ -32,7 +35,7 @@ private:
 public:
 	GLTframeDetect(int moduleSide);
 	~GLTframeDetect();
-	int *framePosition(Point (&rawOutput)[6],Point (&avrOutput)[6],Mat input,Mat &out);
+	int *framePosition(Point (&rawOutput)[6],Point (&avrOutput)[6],Mat input);
 };
 
 #endif

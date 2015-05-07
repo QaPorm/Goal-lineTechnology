@@ -1,3 +1,16 @@
+//////////////////////////////////////////////////////////////////////////////
+//	GOAL-LINE TECHNOLOGY													//
+//	Senior Project 2014 (Computer Engineering)								//
+//	Faculty of Engineering, Mahidol University								//
+//	Nattaya Sriphop															//
+//	Patchara Chanprakhon													//
+//	Rungroj Somwong															//
+//////////////////////////////////////////////////////////////////////////////
+//	glt_server.cpp - connect with client and receive goal frame position 	//
+//					 for set goal area, then loop recceive ball position.	//
+//					 decision and show result								//
+//////////////////////////////////////////////////////////////////////////////
+
 #include<iostream>
 #include<string>
 #include<thread>
@@ -21,8 +34,8 @@ int rad[3],timestamp[3];
 
 void resultDisplay()
 {
-	Mat nogoal=imread("images/nogoal.png",CV_LOAD_IMAGE_COLOR);
-	Mat goal=imread("images/goal.png",CV_LOAD_IMAGE_COLOR);
+	Mat nogoal=imread("../src/images/nogoal.png",CV_LOAD_IMAGE_COLOR);
+	Mat goal=imread("../src/images/goal.png",CV_LOAD_IMAGE_COLOR);
 	namedWindow("Result",CV_WINDOW_AUTOSIZE);
 	while(1)
 	{
@@ -44,7 +57,7 @@ void resultDisplay()
 void clientConnect(int side,string name)
 {
 	int port=side*1111;
-	Mat img=Mat::zeros(360,640,CV_8UC3);	//360,640
+	Mat img=Mat::zeros(360,640,CV_8UC3);
 	int bytes,imgsize=img.total()*img.elemSize();
 	uchar sockData[imgsize];
 	int32_t notice;
@@ -307,7 +320,7 @@ int main()
 		{
 			if(leftGoal==1&&rightGoal==1)
 			{
-				if(sqrt(pow(ball[0].x-ball[1].x,2)+pow(ball[0].y-ball[1].y,2))<=20)	//check left and right has similar position
+				if(sqrt(pow(ball[0].x-ball[1].x,2)+pow(ball[0].y-ball[1].y,2))<=100)	//check left and right has similar position
 					isGoal=1;
 			}
 		}
@@ -334,19 +347,19 @@ int main()
 	return 0;
 }
 
-
-//init and processing step, link protocol
-//(server)each thread countModule++ after finish
-//(server)all thread except mainthread wait
-//(server)mainthread check countModule==3
-//(server)mainthread countModule++
-//(server)notify all 
-//(client)while loop sleep for waiting
-//(server)send notice to client tell that serverProcess will create
-//(server)delete serverInit
-//(client)exit loop
-//(client)wait for 10 s
-//(server)create serverProcess
-//(client)connect
-//(server)after connect start loop recv
-//(client)after connebt start loop send
+//init and processing step, link protocol/////////////////////////////////////////////////////////
+//	(server)each thread countModule++ after finish
+//	(server)all thread except mainthread wait
+//	(server)mainthread check countModule==3
+//	(server)mainthread countModule++
+//	(server)notify all 
+//	(client)while loop sleep for waiting
+//	(server)send notice to client tell that serverProcess will create
+//	(server)delete serverInit
+//	(client)exit loop
+//	(client)wait for 10 s
+//	(server)create serverProcess
+//	(client)connect
+//	(server)after connect start loop recv
+//	(client)after connebt start loop send
+//////////////////////////////////////////////////////////////////////////////////////////////////
